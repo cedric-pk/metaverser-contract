@@ -19,7 +19,6 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
     address public minerAddr;
     bool public isPaused;
 
-    mapping(address => bool) private whitelist;
     mapping(uint256 => MarketItems) public gameAssets;
 
     constructor(IERC20 _erc20, IMetaverserItems _itemsContract) {
@@ -28,7 +27,6 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
         isPaused = false;
         daoAddr = msg.sender;
         minerAddr = msg.sender;
-        whitelist[msg.sender] = true;
     }
 
     modifier tokenOwnerAccess(uint256 tokenId, uint256 supply) {
@@ -41,13 +39,7 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
         _;
     }
 
-    modifier whitelisted(){
-        require(whitelist[msg.sender] , "You are not whitelisted");
-        _;
-    }
-
-
-    function addAssetToMarket(uint256 tokenId, uint256 supply, uint256 price) public tokenOwnerAccess(tokenId, supply) openMarket whitelisted {
+    function addAssetToMarket(uint256 tokenId, uint256 supply, uint256 price) public tokenOwnerAccess(tokenId, supply) openMarket {
         require(tokenId < itemsContract.getTokenCount() , 'Invalid tokenId') ;
         require(price > 0 , 'Invalid price');
         require(supply > 0 , 'Invalid supply');
@@ -101,9 +93,5 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
 
     function setMinersAddress(address _addr) public onlyOwner {
         minerAddr = _addr;
-    }
-
-    function setWhitelist(address _addr, bool _val) public onlyOwner {
-        whitelist[_addr] = _val;
     }
 }
