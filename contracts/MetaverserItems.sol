@@ -26,7 +26,7 @@ contract MetaverserItems is ERC1155, IMetaverserItems, Ownable{
     }
 
     modifier whitelisted(){
-        require(whitelist[msg.sender] , "Market: You are not whitelisted");
+        require(whitelist[msg.sender] , "You are not whitelisted");
         _;
     }
 

@@ -41,7 +41,13 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
         _;
     }
 
-    function addAssetToMarket(uint256 tokenId, uint256 supply, uint256 price) public tokenOwnerAccess(tokenId, supply) openMarket {
+    modifier whitelisted(){
+        require(whitelist[msg.sender] , "You are not whitelisted");
+        _;
+    }
+
+
+    function addAssetToMarket(uint256 tokenId, uint256 supply, uint256 price) public tokenOwnerAccess(tokenId, supply) openMarket whitelisted {
         require(tokenId < itemsContract.getTokenCount() , 'Invalid tokenId') ;
         require(price > 0 , 'Invalid price');
         require(supply > 0 , 'Invalid supply');
@@ -60,11 +66,11 @@ contract MarketplaceAssets is IMetaverserAssets, Ownable {
 
         uint256 totalPrice = gameAssets[assetId].price * amount;
         uint256 DAOTax = totalPrice * daoPercent / 100;
-        uint256 MinnersTax = totalPrice * minerPercent / 100;
+        uint256 MinersTax = totalPrice * minerPercent / 100;
 
         if(gameAssets[assetId].owner != owner()) {
             MTVTToken.transferFrom(msg.sender, daoAddr, DAOTax);
-            MTVTToken.transferFrom(msg.sender, minerAddr, MinnersTax);
+            MTVTToken.transferFrom(msg.sender, minerAddr, MinersTax);
         }
 
         MTVTToken.transferFrom(msg.sender, gameAssets[assetId].owner , totalPrice);
